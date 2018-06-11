@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="bootstrap.js" ></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore.js"></script>
+<!-- Latest compiled and minified JavarScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="search.js"></script>
+</head>
+<body>
+<div class="heading" id = "heading">
+	<h3>Hacker news Article</h3>
+	<h4>Best Hacker News Aricles.</h4>
+	
+</div>
+<div class="wrapper">
+  <form autocomplete="off">	
+	<div class="search_container">
+		
+        <input  class="search_box" id = "search_box" placeholder="Search By Name..."><button type='button' onclick="print_by_name(document.getElementsByTagName('input')[0].value)">Search</button>
+
+          <div class="search_list" id="search_list">   
+          </div>
+        </div>
+	</form>
+	
+    <div class="filter">
+     &nbsp&nbsp&nbsp&nbspSort By Points:&nbsp&nbsp&nbsp 	
+     <input type="checkbox" id = "ascending" onclick="sort_and_print(1)"> Lower&nbsp&nbsp&nbsp&nbsp
+     <input type="checkbox" id="descending" onclick="sort_and_print(0)"> Higher&nbsp&nbsp&nbsp&nbsp
+     Sort By Date:&nbsp&nbsp&nbsp
+     <input type="checkbox" id="latest" onclick="sort_and_print(2)"> Latest&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+     <input type="checkbox" id="oldest" onclick="sort_and_print(3)"> Oldest&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+     <input type="checkbox" id="print_all" onclick="print_all_of_them()"> Reset
+	</div> 
+    <div class="tab-content" id ="tab-content">
+      
+     </div>
+     <ul class="nav nav-tabs" role="tablist" id="profileTabs">
+    </ul>   
+</div>
+<script type="text/javascript">
+	 const url = "http://starlord.hackerearth.com/hackernews";
+	 //autocomplete(document.getElementById("search_box"));
+      
+      function createNode(element) {
+        return document.createElement(element);
+      }
+
+      function append(parent, el) {
+        return parent.appendChild(el);
+      }
+
+        function print_all_of_them(){
+        var s = localStorage.getItem('all_news');
+        
+        document.getElementById('print_all').checked = false;
+        document.getElementById('ascending').checked = false;
+        document.getElementById('descending').checked = false;
+        document.getElementById('latest').checked = false;
+        document.getElementById('oldest').checked = false;
+        var data = JSON.parse(s);
+        
+        const ul = document.getElementById("profileTabs");
+        const p = document.getElementById("tab-content");
+        p.innerHTML="";
+        ul.innerHTML="";
+        let div;
+       
+        for (i = 0; i < data.length; i++) {
+          //
+          if((i)%7==0){
+          	let li = createNode("li");
+          	let div2 = createNode("div");
+          	div2.setAttribute("role","tabpanel");
+            
+          	//li.innerHTML = i/7+1;
+          	if(i==0){
+                li.setAttribute("role","presentation");
+                li.setAttribute("class","active");
+                div2.setAttribute("class","tab-pane fade in active");
+
+          	}
+          	else{
+          		li.setAttribute("role","presentation");
+          		div2.setAttribute("class","tab-pane fade");
+                //li.setAttribute("class","active");
+          	}
+            var k = (i)/7+1;
+          	let a = createNode("a");
+          	a.setAttribute("href", "#newsfeed_div_"+k);
+          	a.setAttribute("aria_controls","newsfeed_div_"+k);
+          	div2.setAttribute("id","newsfeed_div_"+k);
+          	a.setAttribute("role","tab");
+          	a.setAttribute("data-toggle","tab");
+          	a.innerHTML = (i)/7+1;	
+            append(li,a);
+            append(ul,li);
+            div = div2;
+            append(p,div2);
+          }
+
+          let link = createNode("a");
+          let span = createNode("span");
+          let h4 = createNode("h3");
+          //console.log(data[i].title);
+          let d3 = createNode("div");
+          d3.setAttribute("class","news_item");
+          link.setAttribute("href",data[i].url);
+          link.setAttribute("target","_blank");
+          h4.innerHTML = data[i].title;
+          append(link,h4);
+          append(d3,link);
+
+          var d1= new Date(data[i].created_at);
+          //console.log(d);
+          var d2 = new Date();
+          var y = d2.getFullYear()-d1.getFullYear();
+          if(y>0){
+          	s = y+" years ago";
+          }
+          else{
+          	var m = d2.getMonth() - d1.getMonth();
+          	if(m>0){
+          		s = m+" months ago";
+          	}
+          	else{
+          		var d = d2.getDate() - d1.getDate();
+          		if(d>0){
+          			s = d+" days ago";
+          		}
+          		else{
+          			var h = d2.getHours() - d1.getHours();
+          			if(h>0){
+          				s = h+" hours ago";
+          			}
+          			else{
+          				var m = d2.getMinutes() - d1.getMinutes();
+          				if(m>0){
+          					s = m+" minutes ago";
+
+          				}
+          				else{
+          					s = " Just now";
+
+          				}
+          			}
+          		} 
+          	}
+          }
+          //console.log(s);
+
+          span.innerHTML =(i+1)+". "+data[i].num_points+" points by "+data[i].author+" "+s+" | hide | "+data[i].num_comments+" comments";
+          //var news = {title:data[i].title,url:data[i].url,num_points:data[i].num_points,num_comments:data[i].num_comments,author:data[i].author,created_at:data[i].created_at};
+          append(d3,span);
+          append(div,d3);
+          
+
+        }
+
+
+        return ;
+
+    }
+        
+        function print_by_name(name){
+        
+        var s = localStorage.getItem('all_news');
+        
+        var data = JSON.parse(s);
+        //console.log(name);
+        document.getElementsByTagName('input')[0].value="";  
+        for(i=0;i<data.length;i++){
+
+         if(data[i].title == name) {
+         	let ul = document.getElementById("profileTabs");
+            let p = document.getElementById("tab-content");
+            p.innerHTML = "";
+            ul.innerHTML = "";
+            let link = createNode("a");
+          let span = createNode("span");
+          let h4 = createNode("h3");
+          //console.log(data[i].title);
+          let d3 = createNode("div");
+          d3.setAttribute("class","news_item");
+          link.setAttribute("href",data[i].url);
+          link.setAttribute("target","_blank");
+          h4.innerHTML = data[i].title;
+          append(link,h4);
+          append(d3,link);
+
+          var d1= new Date(data[i].created_at);
+          //console.log(d);
+          var d2 = new Date();
+          var y = d2.getFullYear()-d1.getFullYear();
+          if(y>0){
+          	s = y+" years ago";
+          }
+          else{
+          	var m = d2.getMonth() - d1.getMonth();
+          	if(m>0){
+          		s = m+" months ago";
+          	}
+          	else{
+          		var d = d2.getDate() - d1.getDate();
+          		if(d>0){
+          			s = d+" days ago";
+          		}
+          		else{
+          			var h = d2.getHours() - d1.getHours();
+          			if(h>0){
+          				s = h+" hours ago";
+          			}
+          			else{
+          				var m = d2.getMinutes() - d1.getMinutes();
+          				if(m>0){
+          					s = m+" minutes ago";
+
+          				}
+          				else{
+          					s = " Just now";
+
+          				}
+          			}
+          		} 
+          	}
+          }
+          //console.log(s);
+
+          span.innerHTML ="1. "+data[i].num_points+" points by "+data[i].author+" "+s+" | hide | "+data[i].num_comments+" comments";
+          //var news = {title:data[i].title,url:data[i].url,num_points:data[i].num_points,num_comments:data[i].num_comments,author:data[i].author,created_at:data[i].created_at};
+          append(d3,span);
+          append(p,d3);
+
+         } 
+      }
+     
+      return ;
+
+       
+
+      }
+       
+
+        function sort_and_print(flag){
+        var s = localStorage.getItem('all_news');
+        let ul = document.getElementById("profileTabs");
+        let p = document.getElementById("tab-content");
+        
+        var data = JSON.parse(s);
+        if(flag==1 && document.getElementById('ascending').checked == true)
+        {
+          data = _.sortBy( data, 'num_points' );
+          document.getElementById('descending').checked = false;
+          document.getElementById('oldest').checked = false;
+          document.getElementById('latest').checked = false;
+          p.innerHTML = "";
+         ul.innerHTML = "";
+         }
+        else if(flag==0 && document.getElementById('descending').checked == true){
+          data = _.sortBy( data, 'num_points' ).reverse();
+          document.getElementById('ascending').checked = false;
+          document.getElementById('oldest').checked = false;
+          document.getElementById('latest').checked = false;
+          p.innerHTML = "";
+          ul.innerHTML = "";
+        }
+        else if(flag==2 && document.getElementById('latest').checked == true){
+          data = _.sortBy( data, 'created_at' ).reverse();
+          document.getElementById('ascending').checked = false;
+          document.getElementById('oldest').checked = false;
+          document.getElementById('descending').checked = false;
+          p.innerHTML = "";
+          ul.innerHTML = "";
+
+        }
+        else if(flag==3 && document.getElementById('oldest').checked == true){
+          data = _.sortBy( data, 'created_at' );
+          document.getElementById('ascending').checked = false;
+          document.getElementById('descending').checked = false;
+          document.getElementById('latest').checked = false;
+          p.innerHTML = "";
+          ul.innerHTML = "";
+
+        }
+
+        else return;
+       // console.log("hi");
+        
+        
+        let div;
+        //var all_news = [];
+        //var names = [];
+        var i;
+        for (i = 0; i < data.length; i++) {
+          //
+
+         
+          if((i)%7==0){
+          	let li = createNode("li");
+          	let div2 = createNode("div");
+          	div2.setAttribute("role","tabpanel");
+            
+          	//li.innerHTML = i/7+1;
+          	if(i==0){
+                li.setAttribute("role","presentation");
+                li.setAttribute("class","active");
+                div2.setAttribute("class","tab-pane fade in active");
+
+          	}
+          	else{
+          		li.setAttribute("role","presentation");
+          		div2.setAttribute("class","tab-pane fade");
+                //li.setAttribute("class","active");
+          	}
+            var k = (i)/7+1;
+          	let a = createNode("a");
+          	a.setAttribute("href", "#newsfeed_div_"+k);
+          	a.setAttribute("aria_controls","newsfeed_div_"+k);
+          	div2.setAttribute("id","newsfeed_div_"+k);
+          	a.setAttribute("role","tab");
+          	a.setAttribute("data-toggle","tab");
+          	a.innerHTML = (i)/7+1;	
+            append(li,a);
+            append(ul,li);
+            div = div2;
+            append(p,div2);
+          }
+
+          let link = createNode("a");
+          let span = createNode("span");
+          let h4 = createNode("h3");
+          //console.log(data[i].title);
+          let d3 = createNode("div");
+          d3.setAttribute("class","news_item");
+          link.setAttribute("href",data[i].url);
+          link.setAttribute("target","_blank");
+          h4.innerHTML = data[i].title;
+          append(link,h4);
+          append(d3,link);
+
+          var d1= new Date(data[i].created_at);
+          //console.log(d);
+          var d2 = new Date();
+          var y = d2.getFullYear()-d1.getFullYear();
+          if(y>0){
+          	s = y+" years ago";
+          }
+          else{
+          	var m = d2.getMonth() - d1.getMonth();
+          	if(m>0){
+          		s = m+" months ago";
+          	}
+          	else{
+          		var d = d2.getDate() - d1.getDate();
+          		if(d>0){
+          			s = d+" days ago";
+          		}
+          		else{
+          			var h = d2.getHours() - d1.getHours();
+          			if(h>0){
+          				s = h+" hours ago";
+          			}
+          			else{
+          				var m = d2.getMinutes() - d1.getMinutes();
+          				if(m>0){
+          					s = m+" minutes ago";
+
+          				}
+          				else{
+          					s = " Just now";
+
+          				}
+          			}
+          		} 
+          	}
+          }
+          //console.log(s);
+
+          span.innerHTML =(i+1)+". "+data[i].num_points+" points by "+data[i].author+" "+s+" | hide | "+data[i].num_comments+" comments";
+          //var news = {title:data[i].title,url:data[i].url,num_points:data[i].num_points,num_comments:data[i].num_comments,author:data[i].author,created_at:data[i].created_at};
+          append(d3,span);
+          append(div,d3);
+          console.log(data[i].created_at);
+          //all_news.push(news);
+          //names.push(data[i].title);
+
+        }
+        return ;
+
+    }
+	 $(document).ready($.getJSON(url, function(data) {
+        
+        //console.log(data.length);
+        const ul = document.getElementById("profileTabs");
+        const p = document.getElementById("tab-content");
+        let div;
+        var all_news = [];
+        var names = [];
+        for (i = 0; i < data.length; i++) {
+          //
+
+          if(i==0)
+          	continue;
+          if((i-1)%7==0){
+          	let li = createNode("li");
+          	let div2 = createNode("div");
+          	div2.setAttribute("role","tabpanel");
+            
+          	//li.innerHTML = i/7+1;
+          	if(i==1){
+                li.setAttribute("role","presentation");
+                li.setAttribute("class","active");
+                div2.setAttribute("class","tab-pane fade in active");
+
+          	}
+          	else{
+          		li.setAttribute("role","presentation");
+          		div2.setAttribute("class","tab-pane fade");
+                //li.setAttribute("class","active");
+          	}
+            var k = (i-1)/7+1;
+          	let a = createNode("a");
+          	a.setAttribute("href", "#newsfeed_div_"+k);
+          	a.setAttribute("aria_controls","newsfeed_div_"+k);
+          	div2.setAttribute("id","newsfeed_div_"+k);
+          	a.setAttribute("role","tab");
+          	a.setAttribute("data-toggle","tab");
+          	a.innerHTML = (i-1)/7+1;	
+            append(li,a);
+            append(ul,li);
+            div = div2;
+            append(p,div2);
+          }
+
+          let link = createNode("a");
+          let span = createNode("span");
+          let h4 = createNode("h3");
+          //console.log(data[i].title);
+          let d3 = createNode("div");
+          d3.setAttribute("class","news_item");
+          link.setAttribute("href",data[i].url);
+          link.setAttribute("target","_blank");
+          h4.innerHTML = data[i].title;
+          append(link,h4);
+          append(d3,link);
+
+          var d1= new Date(data[i].created_at);
+          //console.log(d);
+          var d2 = new Date();
+          var y = d2.getFullYear()-d1.getFullYear();
+          if(y>0){
+          	s = y+" years ago";
+          }
+          else{
+          	var m = d2.getMonth() - d1.getMonth();
+          	if(m>0){
+          		s = m+" months ago";
+          	}
+          	else{
+          		var d = d2.getDate() - d1.getDate();
+          		if(d>0){
+          			s = d+" days ago";
+          		}
+          		else{
+          			var h = d2.getHours() - d1.getHours();
+          			if(h>0){
+          				s = h+" hours ago";
+          			}
+          			else{
+          				var m = d2.getMinutes() - d1.getMinutes();
+          				if(m>0){
+          					s = m+" minutes ago";
+
+          				}
+          				else{
+          					s = " Just now";
+
+          				}
+          			}
+          		} 
+          	}
+          }
+          //console.log(s);
+
+          span.innerHTML =(i)+". "+data[i].num_points+" points by "+data[i].author+" "+s+" | hide | "+data[i].num_comments+" comments";
+          var news = {title:data[i].title,url:data[i].url,num_points:data[i].num_points,num_comments:data[i].num_comments,author:data[i].author,created_at:data[i].created_at};
+          append(d3,span);
+          append(div,d3);
+          all_news.push(news);
+          names.push(data[i].title);
+
+        }
+        localStorage.setItem('all_news',JSON.stringify(all_news));
+        localStorage.setItem('names',names);
+        //console.log(names[0]); 
+        autocomplete(document.getElementById("search_box"));    
+      }));
+</script>
+</body>
+</html>
